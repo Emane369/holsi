@@ -1,33 +1,58 @@
-import streamlit as st
+# Accesorios y slots
+slots = ["S1", "S2", "S3"]
+accesorios = [
+    "Weapon", "Head", "Face", "Gloves", "Ring", "Earring", "Talisman",
+    "Top", "Neck", "Back", "Comp", "Bottoms", "Shoes", "Extra"
+]
 
-# Título
-st.title("Recomendación de Producción de Cemento")
-st.write("Basado en inventario diario y KPIs de demanda.")
-
-# Tipos de cemento y KPIs fijos
-cementos = {
-    'ECPC30': 1300,
-    'ECPC3025': 300,
-    'EO-MM': 800,
-    'EO-MM25': 300,
-    'BB': 240
+# Estructura para almacenar datos
+data = {
+    slot: {} for slot in slots
 }
+extras = {}
 
-st.header("📦 Ingreso de Inventario Diario")
-inventario = {}
-for tipo, kpi in cementos.items():
-    valor = st.number_input(f"{tipo} (KPI: {kpi})", min_value=0, value=0, step=10)
-    inventario[tipo] = valor
+# Función para ingresar valores
+def pedir_valores():
+    print("\n--- Ingreso de valores por slot ---\n")
+    for slot in slots:
+        print(f"\n--- {slot} ---")
+        for acc in accesorios:
+            while True:
+                try:
+                    valor = int(input(f"Ingrese valor para {acc} en {slot}: "))
+                    break
+                except ValueError:
+                    print("Por favor, ingresa un número entero.")
+            data[slot][acc] = valor
 
-# Procesamiento de prioridad
-st.header("📊 Recomendación de Producción")
-if st.button("Calcular"):
-    recomendaciones = {}
-    for tipo in cementos:
-        prioridad = max(cementos[tipo] - inventario[tipo], 0)
-        recomendaciones[tipo] = prioridad
+    print("\n--- Ingreso de extras ---")
+    for extra in ["Tarots", "SS"]:
+        while True:
+            try:
+                valor = int(input(f"Ingrese valor para {extra}: "))
+                break
+            except ValueError:
+                print("Por favor, ingresa un número entero.")
+        extras[extra] = valor
 
-    # Ordenar por prioridad
-    ordenado = sorted(recomendaciones.items(), key=lambda x: x[1], reverse=True)
-    for tipo, prioridad in ordenado:
-        st.write(f"🔹 **{tipo}**: Prioridad de producción = {prioridad} unidades")
+# Función para calcular totales
+def calcular_totales():
+    total_por_slot = {slot: sum(data[slot].values()) for slot in slots}
+    total_general = sum(total_por_slot.values()) + sum(extras.values())
+
+    return {
+        "LBP": total_por_slot["S1"],
+        "LBC": total_por_slot["S2"],
+        "TAC": total_por_slot["S3"],
+        "TAP": extras["Tarots"],
+        "PUP": extras["SS"],
+        "PUC": total_general
+    }
+
+# Ejecutar el ingreso de datos y mostrar resultados
+if __name__ == "__main__":
+    pedir_valores()
+    print("\n--- Resultados ---")
+    totales = calcular_totales()
+    for clave, valor in totales.items():
+        print(f"{clave}: {valor}")
