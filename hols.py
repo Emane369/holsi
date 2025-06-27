@@ -1,58 +1,67 @@
-# Accesorios y slots
-slots = ["S1", "S2", "S3"]
-accesorios = [
-    "Weapon", "Head", "Face", "Gloves", "Ring", "Earring", "Talisman",
-    "Top", "Neck", "Back", "Comp", "Bottoms", "Shoes", "Extra"
-]
+def calcular_totales_stats():
+    """
+    Script para solicitar al usuario los valores de estadísticas de un set de equipo
+    y calcular los totales para cada estadística principal.
+    """
+    # --- Definición de las estructuras de datos ---
+    variables_principales = ['LBC', 'LBP', 'TAC', 'TAP', 'PUC', 'PUP']
+    objetos_equipo = [
+        'WEAPON', 'HEAD', 'GLOVES', 'FACE', 'COMP', 'RING', 'TOP', 'BOTTOM',
+        'EARRING', 'NECK', 'SHOES', 'TALISMAN', 'BACK', 'EXTRA'
+    ]
+    slots = ['S1', 'S2', 'S3']
 
-# Estructura para almacenar datos
-data = {
-    slot: {} for slot in slots
-}
-extras = {}
+    # Diccionario para almacenar la suma total de cada variable principal
+    totales = {variable: 0 for variable in variables_principales}
 
-# Función para ingresar valores
-def pedir_valores():
-    print("\n--- Ingreso de valores por slot ---\n")
-    for slot in slots:
-        print(f"\n--- {slot} ---")
-        for acc in accesorios:
+    print("--- INICIO DE INGRESO DE DATOS ---")
+    print("Para cada slot, ingresa el tipo de variable y su valor.")
+    print("Si un slot está vacío, solo presiona Enter para omitirlo.\n")
+
+    # --- Bucle para el ingreso de datos ---
+    for objeto in objetos_equipo:
+        print(f"--- Objeto: {objeto} ---")
+        for slot in slots:
+            # Bucle para asegurar que la variable ingresada sea válida
             while True:
-                try:
-                    valor = int(input(f"Ingrese valor para {acc} en {slot}: "))
+                variable_ingresada = input(
+                    f"  > Slot {slot} - Tipo de variable ({', '.join(variables_principales)}): ").upper()
+
+                if not variable_ingresada:
+                    # El usuario presionó Enter, el slot está vacío
                     break
-                except ValueError:
-                    print("Por favor, ingresa un número entero.")
-            data[slot][acc] = valor
 
-    print("\n--- Ingreso de extras ---")
-    for extra in ["Tarots", "SS"]:
-        while True:
-            try:
-                valor = int(input(f"Ingrese valor para {extra}: "))
-                break
-            except ValueError:
-                print("Por favor, ingresa un número entero.")
-        extras[extra] = valor
+                if variable_ingresada in variables_principales:
+                    # La variable es válida, salimos del bucle de validación
+                    break
+                else:
+                    print(f"    [Error] Variable '{variable_ingresada}' no es válida. Intenta de nuevo.")
 
-# Función para calcular totales
-def calcular_totales():
-    total_por_slot = {slot: sum(data[slot].values()) for slot in slots}
-    total_general = sum(total_por_slot.values()) + sum(extras.values())
+            # Si se ingresó una variable, solicitar su valor
+            if variable_ingresada:
+                # Bucle para asegurar que el valor sea un número
+                while True:
+                    try:
+                        valor_ingresado = float(input(f"    > Slot {slot} - Valor de {variable_ingresada}: "))
+                        # Sumar el valor al total correspondiente
+                        totales[variable_ingresada] += valor_ingresado
+                        break
+                    except ValueError:
+                        print("    [Error] Por favor, ingresa solo un valor numérico.")
+        print("-" * (len(objeto) + 14) + "\n")  # Línea separadora
 
-    return {
-        "LBP": total_por_slot["S1"],
-        "LBC": total_por_slot["S2"],
-        "TAC": total_por_slot["S3"],
-        "TAP": extras["Tarots"],
-        "PUP": extras["SS"],
-        "PUC": total_general
-    }
+    # --- Muestra de resultados finales ---
+    print("\n===================================")
+    print("--- TOTALES FINALES ---")
+    print("===================================")
 
-# Ejecutar el ingreso de datos y mostrar resultados
+    for variable, total in totales.items():
+        # Se formatea el total para mostrarlo de forma clara
+        print(f"{variable}: {total:g}")  # :g elimina ceros decimales innecesarios
+
+    print("\n--- CÁLCULO COMPLETADO ---")
+
+
+# --- Ejecutar la función principal ---
 if __name__ == "__main__":
-    pedir_valores()
-    print("\n--- Resultados ---")
-    totales = calcular_totales()
-    for clave, valor in totales.items():
-        print(f"{clave}: {valor}")
+    calcular_totales_stats()
